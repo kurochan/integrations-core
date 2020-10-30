@@ -126,10 +126,10 @@ class ZookeeperCheck(AgentCheck):
         self.sc_tags = ["host:{0}".format(self.host), "port:{0}".format(self.port)] + self.base_tags
         self.should_report_instance_mode = is_affirmative(self.instance.get("report_instance_mode", True))
         self.ssl = bool(self.instance.get('ssl', False))
-        self.private_key = self.instance.get('private_key', os.path.join(HERE, 'compose', 'private_key.pem'))
-        self.ca_cert = self.instance.get('ca_cert', os.path.join(HERE, 'compose', 'ca_cert.pem'))
-        self.cert = self.instance.get('cert', os.path.join(HERE, 'compose', 'cert.pem'))
-        self.password = self.instance.get('password', 'testpass')
+        self.private_key = self.instance.get('private_key')
+        self.ca_cert = self.instance.get('ca_cert')
+        self.cert = self.instance.get('cert')
+        self.password = self.instance.get('password')
 
     def check(self, _):
         # Send a service check based on the `ruok` response.
