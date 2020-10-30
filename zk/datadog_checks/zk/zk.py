@@ -134,6 +134,8 @@ class ZookeeperCheck(AgentCheck):
     def check(self, _):
         # Send a service check based on the `ruok` response.
         # Set instance status to down if not ok.
+        status = None
+        message = None
         try:
             ruok_out = self._send_command('ruok')
         except ZKConnectionFailure:
@@ -257,14 +259,14 @@ class ZookeeperCheck(AgentCheck):
             context = ssl.create_default_context()
             context.load_cert_chain(certfile=self.cert, keyfile=self.private_key, password=self.password)
             context.load_verify_locations(cafile=self.ca_cert)
-            with socket.create_connection((self.host, self.port)) as sock:
-                with context.wrap_socket(sock, server_hostname=self.host) as ssock:
-                    ssock.settimeout(self.timeout)
-                    try:
-                        buf = self._get_data(ssock, command)
+            with closing(socket.create_connection((self.host, self.port))) as sock:
+                ssock = context.wrap_socket(sock, server_hostname=self.host)
+                ssock.settimeout(self.timeout)
+                try:
+                    buf = self._get_data(ssock, command)
 
-                    except (socket.timeout, socket.error):
-                        raise ZKConnectionFailure()
+                except (socket.timeout, socket.error):
+                    raise ZKConnectionFailure()
         else:
             with closing(socket.socket()) as sock:
                 sock.settimeout(self.timeout)

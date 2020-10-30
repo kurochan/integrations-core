@@ -2,16 +2,12 @@
 # All rights reserved
 # Licensed under Simplified BSD License (see LICENSE)
 import os
-import sys
-import time
 
 import pytest
 
 from datadog_checks.base.utils.common import get_docker_hostname
-from datadog_checks.dev import RetryError, docker_run, WaitFor
+from datadog_checks.dev import docker_run
 from datadog_checks.dev.conditions import CheckDockerLogs
-from datadog_checks.zk import ZookeeperCheck
-from datadog_checks.zk.zk import ZKConnectionFailure
 
 CHECK_NAME = 'zk'
 HOST = get_docker_hostname()
@@ -37,6 +33,7 @@ VALID_SSL_CONFIG = {
 
 STATUS_TYPES = ['leader', 'follower', 'observer', 'standalone', 'down', 'inactive', 'unknown']
 
+# This is different than VALID_SSL_CONFIG since the key locations are different
 VALID_SSL_CONFIG_FOR_TEST = {
     'host': HOST,
     'port': PORT,
@@ -58,9 +55,21 @@ def get_instance():
     return VALID_CONFIG
 
 
+@pytest.fixture(scope="session")
+def get_test_instance():
+    if get_ssl():
+        return VALID_SSL_CONFIG_FOR_TEST
+    return VALID_CONFIG
+
+
 @pytest.fixture
 def get_invalid_mode_instance():
-    return {'host': HOST, 'port': PORT, 'expected_mode': "follower", 'tags': []}
+    invalid_mode = VALID_CONFIG
+    if get_ssl():
+        invalid_mode = VALID_SSL_CONFIG_FOR_TEST
+
+    invalid_mode['expected_mode'] = "follower"
+    return invalid_mode
 
 
 @pytest.fixture
