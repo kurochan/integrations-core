@@ -93,9 +93,6 @@ class ZKMetric(tuple):
         return super(ZKMetric, cls).__new__(cls, [name, value, m_type, m_tags])
 
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-
-
 class ZookeeperCheck(AgentCheck):
     """
     ZooKeeper AgentCheck.

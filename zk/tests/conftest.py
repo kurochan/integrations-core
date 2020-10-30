@@ -94,11 +94,12 @@ def dd_environment(get_instance):
     compose_file = os.path.join(HERE, 'compose', 'zk.yaml')
     if [3, 5, 0] <= get_version() < [3, 6, 0]:
         compose_file = os.path.join(HERE, 'compose', 'zk35.yaml')
+        if get_ssl():
+            compose_file = os.path.join(HERE, 'compose', 'zk35_ssl.yaml')
     elif get_version() >= [3, 6, 0]:
         compose_file = os.path.join(HERE, 'compose', 'zk36plus.yaml')
-
-    if get_ssl():
-        compose_file = os.path.join(HERE, 'compose', 'zk36plus_ssl.yaml')
+        if get_ssl():
+            compose_file = os.path.join(HERE, 'compose', 'zk36plus_ssl.yaml')
 
     private_key = os.path.join(HERE, 'compose', 'private_key.pem')
     cert = os.path.join(HERE, 'compose', 'cert.pem')
@@ -110,7 +111,6 @@ def dd_environment(get_instance):
             'Starting server',
         )
     ]
-
     with docker_run(compose_file, conditions=condition):
         yield get_instance, {
             'docker_volumes': [
