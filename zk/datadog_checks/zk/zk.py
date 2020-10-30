@@ -56,7 +56,6 @@ zk_max_file_descriptor_count    4096
 ```
 
 """
-import os
 import re
 import socket
 import ssl
